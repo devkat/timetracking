@@ -4,10 +4,11 @@ lazy val server = (project in file("server")).
     scalaJSProjects := Seq(client),
     pipelineStages in Assets := Seq(scalaJSPipeline),
     // triggers scalaJSPipeline when using compile or continuous compilation
-    compile in Compile <<= (compile in Compile) dependsOn scalaJSPipeline,
+    compile in Compile := ((compile in Compile) dependsOn scalaJSPipeline).value,
     libraryDependencies ++= Settings.serverDependencies.value,
     WebKeys.packagePrefix in Assets := "public/",
-    managedClasspath in Runtime += (packageBin in Assets).value
+    managedClasspath in Runtime += (packageBin in Assets).value,
+    Revolver.enableDebugging(port = 5050)
   ).
   enablePlugins(SbtWeb, SbtTwirl, JavaAppPackaging).
   dependsOn(sharedJvm)
@@ -17,7 +18,8 @@ lazy val client = (project in file("client")).
     scalaVersion := Settings.versions.scala,
     scalaJSUseMainModuleInitializer := true,
     scalaJSUseMainModuleInitializer in Test := false,
-    libraryDependencies ++= Settings.clientDependencies.value
+    libraryDependencies ++= Settings.clientDependencies.value,
+    jsDependencies ++= Settings.jsDependencies.value
   ).
   enablePlugins(ScalaJSPlugin, ScalaJSWeb).
   dependsOn(sharedJs)

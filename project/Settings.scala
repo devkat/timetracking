@@ -40,6 +40,10 @@ object Settings {
     val tether = "1.4.0"
   }
 
+  object dependencies {
+    val bootstrap = "org.webjars" % "bootstrap" % versions.bootstrap
+  }
+
   /**
    * These dependencies are shared between JS and JVM projects
    * the special %%% function selects the correct version for each project
@@ -53,8 +57,6 @@ object Settings {
   val serverDependencies = Def.setting(Seq(
     "com.typesafe.akka" %% "akka-http" % versions.akkaHttp,
     "com.vmunier" %% "scalajs-scripts" % versions.scalaJsScripts,
-    "org.webjars" % "font-awesome" % "4.3.0-1" % Provided,
-    "org.webjars" % "bootstrap" % versions.bootstrap % Provided,
     "com.lihaoyi" %% "utest" % versions.uTest % Test
   ))
 
@@ -67,16 +69,17 @@ object Settings {
     "io.suzaku" %%% "diode-react" % versions.diode,
     "org.scala-js" %%% "scalajs-dom" % versions.scalaDom,
     "com.lihaoyi" %%% "utest" % versions.uTest % Test,
-    "com.lihaoyi" %%% "upickle" % versions.uPickle
+    "com.lihaoyi" %%% "upickle" % versions.uPickle,
+    dependencies.bootstrap exclude("org.webjars", "jquery")
   ))
 
   /** Dependencies for external JS libs that are bundled into a single .js file according to dependency order */
   val jsDependencies = Def.setting(Seq(
     "org.webjars.bower" % "react" % versions.react / "react-with-addons.js" minified "react-with-addons.min.js" commonJSName "React",
     "org.webjars.bower" % "react" % versions.react / "react-dom.js" minified "react-dom.min.js" dependsOn "react-with-addons.js" commonJSName "ReactDOM",
-    "org.webjars" % "jquery" % versions.jQuery / "jquery.js" minified "jquery.min.js",
-    "org.webjars" % "bootstrap" % versions.bootstrap / "bootstrap.js" minified "bootstrap.min.js" dependsOn "jquery.js",
-    "org.webjars" % "log4javascript" % versions.log4js / "js/log4javascript_uncompressed.js" minified "js/log4javascript.js",
-    "org.webjars.bower" % "tether" % versions.tether / "js/tether.js" minified "js/tether.min.js"
+    "org.webjars" % "jquery" % versions.jQuery / s"${versions.jQuery}/jquery.js" minified "jquery.min.js",
+    "org.webjars.bower" % "tether" % versions.tether / "dist/js/tether.js" minified "dist/js/tether.min.js",
+    dependencies.bootstrap / "bootstrap.js" minified "bootstrap.min.js" dependsOn(s"${versions.jQuery}/jquery.js", "dist/js/tether.js"),
+    "org.webjars" % "log4javascript" % versions.log4js / "js/log4javascript_uncompressed.js" minified "js/log4javascript.js"
   ))
 }
